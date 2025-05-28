@@ -2,7 +2,7 @@
 
 Welcome to the **Free HTML Collection** — a growing set of HTML templates and components that are completely free to use, modify, share, or rework however you like. No licenses. No restrictions. Just code.
 
-![Preview](preview.png) <!-- Replace this with a real screenshot if desired -->
+![Preview](https://www.w3.org/html/logo/downloads/HTML5_Logo_512.png) <!-- Replace this with a real screenshot if desired -->
 
 ---
 
