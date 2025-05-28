@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Click Speed Test</title>
+    <style>
+        /* Base Styles - 150 lines */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(40, 40, 40, 0.8) 0%, rgba(0, 0, 0, 0.9) 100%);
+            z-index: -1;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 3.5rem;
+            background: linear-gradient(45deg, #ff00cc, #3333ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            letter-spacing: 2px;
+            position: relative;
+        }
+        
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ff00cc, #3333ff, transparent);
+            border-radius: 3px;
+        }
+        
+        /* Game Area Styles - 200 lines */
+        .game-area {
+            background: rgba(20, 20, 20, 0.8);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-area::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.03) 50%,
+                transparent 100%
+            );
+            transform: rotate(45deg);
+            animation: shine 6s infinite linear;
+            z-index: -1;
+        }
+        
+        @keyframes shine {
+            0% {
+                transform: rotate(45deg) translate(-30%, -30%);
+            }
+            100% {
+                transform: rotate(45deg) translate(30%, 30%);
+            }
+        }
+        
+        .timer-display {
+            font-size: 5rem;
+            text-align: center;
+            margin: 1rem 0;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            letter-spacing: 2px;
+        }
+        
+        .click-counter {
+            font-size: 3rem;
+            text-align: center;
+            margin: 1rem 0;
+            color: #4caf50;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+        
+        .click-area {
+            background: rgba(30, 30, 30, 0.7);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .click-area:hover {
+            background: rgba(40, 40, 40, 0.8);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .click-area:active {
+            transform: scale(0.98);
+        }
+        
+        .click-area.active {
+            background: rgba(50, 50, 50, 0.9);
+            border: 2px solid rgba(76, 175, 80, 0.5);
+        }
+        
+        .click-area-text {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            user-select: none;
+        }
+        
+        .click-area.active .click-area-text {
+            color: #4caf50;
+            font-weight: bold;
+        }
+        
+        /* Button Styles - 150 lines */
+        .btn {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            margin: 0.5rem;
+            outline: none;
+            position: relative;
+            overflow: hidden;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.5s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-start {
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+        }
+        
+        .btn-reset {
+            background: linear-gradient(135deg, #f44336, #c62828);
+        }
+        
+        .btn-mode {
+            background: linear-gradient(135deg, #2196f3, #1565c0);
+        }
+        
+        .btn-stats {
+            background: linear-gradient(135deg, #ff9800, #e65100);
+        }
+        
+        .btn-cheat {
+            background: linear-gradient(135deg, #9c27b0, #6a1b9a);
+        }
+        
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+        
+        /* Mode Selection - 100 lines */
+        .mode-selection {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+        
+        .mode-btn {
+            background: rgba(40, 40, 40, 0.8);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.6rem 1.2rem;
+            margin: 0.3rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .mode-btn:hover {
+            background: rgba(60, 60, 60, 0.8);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .mode-btn.active {
+            background: linear-gradient(135deg, #2196f3, #1565c0);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 0 15px rgba(33, 150, 243, 0.5);
+        }
+        
+        /* Stats Display - 150 lines */
+        .stats-container {
+            background: rgba(20, 20, 20, 0.8);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+        
+        .stats-container.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stats-title {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            color: #ff9800;
+            position: relative;
+        }
+        
+        .stats-title::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff9800, transparent);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .stat-item {
+            background: rgba(30, 30, 30, 0.7);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4caf50;
+            margin: 0.5rem 0;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* Cheat Notification - 50 lines */
+        .cheat-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(156, 39, 176, 0.9);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+        }
+        
+        .cheat-notification.show {
+            transform: translateX(0);
+        }
+        
+        .cheat-notification::before {
+            content: "⚠️";
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        /* Responsive Design - 100 lines */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .timer-display {
+                font-size: 3.5rem;
+            }
+            
+            .click-counter {
+                font-size: 2.5rem;
+            }
+            
+            .click-area {
+                height: 200px;
+            }
+            
+            .btn {
+                padding: 0.7rem 1.2rem;
+                font-size: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .timer-display {
+                font-size: 2.5rem;
+            }
+            
+            .click-counter {
+                font-size: 2rem;
+            }
+            
+            .click-area-text {
+                font-size: 1.2rem;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 80%;
+                margin: 0.3rem 0;
+            }
+        }
+        
+        /* Animations - 100 lines */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+            }
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
+        }
+        
+        .pulse {
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes clickEffect {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+        
+        .click-effect {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+            animation: clickEffect 0.6s ease-out forwards;
+        }
+        
+        /* Footer - 50 lines */
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            padding: 1rem;
+        }
+        
+        footer a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        footer a:hover {
+            color: #2196f3;
+        }
+        
+        /* Additional decorative elements */
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        /* Easter egg styles */
+        .easter-egg {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.2);
+            cursor: default;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ultimate Click Speed Test</h1>
+        
+        <div class="game-area">
+            <div class="timer-display" id="timer">00:00</div>
+            <div class="click-counter" id="counter">0</div>
+            
+            <div class="click-area" id="clickArea">
+                <div class="click-area-text" id="clickAreaText">Click to Start</div>
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn btn-start" id="startBtn">Start</button>
+                <button class="btn btn-reset" id="resetBtn">Reset</button>
+                <button class="btn btn-stats" id="statsBtn">Show Stats</button>
+                <button class="btn btn-cheat" id="cheatBtn">Cheat: Press K</button>
+            </div>
+            
+            <div class="mode-selection">
+                <button class="mode-btn active" data-time="5">5 Seconds</button>
+                <button class="mode-btn" data-time="10">10 Seconds</button>
+                <button class="mode-btn" data-time="15">15 Seconds</button>
+                <button class="mode-btn" data-time="30">30 Seconds</button>
+                <button class="mode-btn" data-time="60">60 Seconds</button>
+            </div>
+        </div>
+        
+        <div class="stats-container" id="statsContainer">
+            <h2 class="stats-title">Your Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">Total Clicks</div>
+                    <div class="stat-value" id="totalClicks">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Clicks Per Second</div>
+                    <div class="stat-value" id="cps">0.00</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Best CPS</div>
+                    <div class="stat-value" id="bestCps">0.00</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Tests Completed</div>
+                    <div class="stat-value" id="testsCompleted">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="cheat-notification" id="cheatNotification">
+        +100 CPS Cheat Activated!
+    </div>
+    
+    <footer>
+        Made with ❤️ | Try pressing <strong>K</strong> during the test for a surprise!
+    </footer>
+    
+    <div class="easter-egg">
+        k=100
+    </div>
+    
+    <script>
+        // DOM Elements
+        const timerDisplay = document.getElementById('timer');
+        const counterDisplay = document.getElementById('counter');
+        const clickArea = document.getElementById('clickArea');
+        const clickAreaText = document.getElementById('clickAreaText');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const statsBtn = document.getElementById('statsBtn');
+        const statsContainer = document.getElementById('statsContainer');
+        const modeBtns = document.querySelectorAll('.mode-btn');
+        const cheatNotification = document.getElementById('cheatNotification');
+        
+        // Stats elements
+        const totalClicksEl = document.getElementById('totalClicks');
+        const cpsEl = document.getElementById('cps');
+        const bestCpsEl = document.getElementById('bestCps');
+        const testsCompletedEl = document.getElementById('testsCompleted');
+        
+        // Game variables
+        let clicks = 0;
+        let timeLeft = 0;
+        let timer;
+        let isRunning = false;
+        let selectedTime = 5;
+        let totalClicks = 0;
+        let testsCompleted = 0;
+        let bestCps = 0;
+        let cheatActivated = false;
+        
+        // Initialize
+        function init() {
+            updateTimerDisplay(selectedTime);
+            loadStats();
+        }
+        
+        // Load stats from localStorage
+        function loadStats() {
+            totalClicks = parseInt(localStorage.getItem('totalClicks')) || 0;
+            bestCps = parseFloat(localStorage.getItem('bestCps')) || 0;
+            testsCompleted = parseInt(localStorage.getItem('testsCompleted')) || 0;
+            
+            totalClicksEl.textContent = totalClicks;
+            bestCpsEl.textContent = bestCps.toFixed(2);
+            testsCompletedEl.textContent = testsCompleted;
+        }
+        
+        // Save stats to localStorage
+        function saveStats() {
+            localStorage.setItem('totalClicks', totalClicks);
+            localStorage.setItem('bestCps', bestCps);
+            localStorage.setItem('testsCompleted', testsCompleted);
+        }
+        
+        // Update timer display
+        function updateTimerDisplay(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Start the game
+        function startGame() {
+            if (isRunning) return;
+            
+            clicks = 0;
+            timeLeft = selectedTime;
+            isRunning = true;
+            cheatActivated = false;
+            
+            counterDisplay.textContent = clicks;
+            updateTimerDisplay(timeLeft);
+            clickAreaText.textContent = 'Click as fast as you can!';
+            clickArea.classList.add('active');
+            startBtn.disabled = true;
+            
+            // Start timer
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay(timeLeft);
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+        
+        // End the game
+        function endGame() {
+            clearInterval(timer);
+            isRunning = false;
+            startBtn.disabled = false;
+            clickArea.classList.remove('active');
+            clickAreaText.textContent = 'Test Complete! Click Reset to try again';
+            
+            // Calculate stats
+            const cps = clicks / selectedTime;
+            totalClicks += clicks;
+            testsCompleted++;
+            
+            if (cps > bestCps) {
+                bestCps = cps;
+            }
+            
+            // Update stats display
+            cpsEl.textContent = cps.toFixed(2);
+            totalClicksEl.textContent = totalClicks;
+            bestCpsEl.textContent = bestCps.toFixed(2);
+            testsCompletedEl.textContent = testsCompleted;
+            
+            // Save stats
+            saveStats();
+            
+            // Show stats
+            statsContainer.classList.add('show');
+        }
+        
+        // Reset the game
+        function resetGame() {
+            clearInterval(timer);
+            isRunning = false;
+            clicks = 0;
+            timeLeft = selectedTime;
+            
+            counterDisplay.textContent = clicks;
+            updateTimerDisplay(timeLeft);
+            clickAreaText.textContent = 'Click to Start';
+            clickArea.classList.remove('active');
+            startBtn.disabled = false;
+        }
+        
+        // Create click effect
+        function createClickEffect(x, y) {
+            const effect = document.createElement('div');
+            effect.className = 'click-effect';
+            effect.style.left = `${x - 10}px`;
+            effect.style.top = `${y - 10}px`;
+            document.body.appendChild(effect);
+            
+            // Remove after animation
+            setTimeout(() => {
+                effect.remove();
+            }, 600);
+        }
+        
+        // Create random particles
+        function createParticles(x, y) {
+            const particleCount = 5;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                const size = Math.random() * 5 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random color
+                const hue = Math.random() * 360;
+                particle.style.backgroundColor = `hsla(${hue}, 100%, 70%, 0.7)`;
+                
+                // Position
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+                
+                document.body.appendChild(particle);
+                
+                // Random animation
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 5 + 2;
+                const lifetime = Math.random() * 1000 + 500;
+                
+                let posX = x;
+                let posY = y;
+                let opacity = 1;
+                
+                const animate = () => {
+                    posX += Math.cos(angle) * velocity;
+                    posY += Math.sin(angle) * velocity;
+                    opacity -= 0.01;
+                    
+                    particle.style.left = `${posX}px`;
+                    particle.style.top = `${posY}px`;
+                    particle.style.opacity = opacity;
+                    
+                    if (opacity > 0) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        particle.remove();
+                    }
+                };
+                
+                requestAnimationFrame(animate);
+                
+                // Remove after lifetime
+                setTimeout(() => {
+                    particle.remove();
+                }, lifetime);
+            }
+        }
+        
+        // Event Listeners
+        startBtn.addEventListener('click', startGame);
+        resetBtn.addEventListener('click', resetGame);
+        
+        statsBtn.addEventListener('click', () => {
+            statsContainer.classList.toggle('show');
+        });
+        
+        clickArea.addEventListener('click', (e) => {
+            if (!isRunning) {
+                startGame();
+                return;
+            }
+            
+            clicks++;
+            counterDisplay.textContent = clicks;
+            
+            // Create click effect
+            const rect = clickArea.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            createClickEffect(e.clientX, e.clientY);
+            
+            // Add pulse animation for visual feedback
+            clickArea.classList.add('pulse');
+            setTimeout(() => {
+                clickArea.classList.remove('pulse');
+            }, 1000);
+        });
+        
+        // Mode selection
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                modeBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedTime = parseInt(btn.dataset.time);
+                resetGame();
+            });
+        });
+        
+        // Cheat code - press K
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'k' && isRunning && !cheatActivated) {
+                clicks += 100;
+                counterDisplay.textContent = clicks;
+                cheatActivated = true;
+                
+                // Show notification
+                cheatNotification.classList.add('show');
+                setTimeout(() => {
+                    cheatNotification.classList.remove('show');
+                }, 3000);
+                
+                // Create particle explosion
+                const rect = clickArea.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                for (let i = 0; i < 50; i++) {
+                    setTimeout(() => {
+                        createParticles(
+                            centerX + (Math.random() - 0.5) * 100,
+                            centerY + (Math.random() - 0.5) * 100
+                        );
+                    }, i * 30);
+                }
+            }
+        });
+        
+        // Initialize the game
+        init();
+    </script>
+</body>
+</html>

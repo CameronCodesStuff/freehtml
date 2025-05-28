@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 PRIVATE Social Toolkit v5.0</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 25px;
+            background: #111;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        h1, h2, h3, h4 {
+            color: #4CAF50;
+            margin-top: 0;
+        }
+        h1 { font-size: 24px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        h2 { font-size: 20px; margin: 20px 0 10px; }
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            background: #1a1a1a;
+            padding: 8px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+        .status-item {
+            display: flex;
+            align-items: center;
+        }
+        .status-item span {
+            margin-left: 5px;
+        }
+        .online { color: #4CAF50; }
+        .offline { color: #f44336; }
+        .platform-selector {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .platform-btn {
+            background: #1a1a1a;
+            color: #e0e0e0;
+            border: 1px solid #333;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .platform-btn:hover {
+            background: #2a2a2a;
+            border-color: #4CAF50;
+        }
+        .platform-btn.active {
+            background: #2a2a2a;
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+        .service-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            transition: all 0.3s;
+        }
+        .service-card:hover {
+            border-color: #4CAF50;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.1);
+        }
+        .btn {
+            background: #4CAF50;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #66BB6A;
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
+        .terminal {
+            background: #000;
+            border: 1px solid #333;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            height: 200px;
+            overflow-y: auto;
+            margin: 20px 0;
+            color: #4CAF50;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .terminal::-webkit-scrollbar {
+            width: 5px;
+        }
+        .terminal::-webkit-scrollbar-thumb {
+            background: #4CAF50;
+            border-radius: 5px;
+        }
+        .blink {
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .loading-bar {
+            width: 0%;
+            height: 4px;
+            background: #4CAF50;
+            margin: 10px 0;
+            transition: width 3s;
+            border-radius: 2px;
+        }
+        .progress-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+        .hidden {
+            display: none;
+        }
+        .captcha-box {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .captcha-text {
+            font-size: 24px;
+            letter-spacing: 5px;
+            background: #222;
+            padding: 10px;
+            margin: 10px 0;
+            color: #4CAF50;
+            user-select: none;
+        }
+        .captcha-input {
+            background: #222;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px;
+            width: 200px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 16px;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted #666;
+            cursor: help;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .last-used {
+            font-size: 11px;
+            color: #666;
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="online">●</div>
+                <span>API Connection: <strong>Secure</strong></span>
+            </div>
+            <div class="status-item">
+                <span>Session expires in: <strong id="session-timer">5:00</strong></span>
+            </div>
+            <div class="status-item">
+                <span>Last Update: <strong>v5.0.2</strong></span>
+            </div>
+        </div>
+
+        <h1>🔐 <span class="blink">PRIVATE</span> Social Toolkit v5.0</h1>
+        <p><em>Advanced account analysis and growth tools. Use responsibly.</em></p>
+        
+        <div class="platform-selector">
+            <div class="platform-btn active" onclick="selectPlatform('instagram')">Instagram</div>
+            <div class="platform-btn" onclick="selectPlatform('snapchat')">Snapchat</div>
+            <div class="platform-btn" onclick="selectPlatform('tiktok')">TikTok</div>
+            <div class="platform-btn" onclick="selectPlatform('facebook')">Facebook</div>
+            <div class="platform-btn" onclick="selectPlatform('twitter')">Twitter</div>
+        </div>
+        
+        <div id="instagram" class="platform-section">
+            <h2>📊 Instagram Toolkit <span class="last-used">Last used: 12 minutes ago</span></h2>
+            <p>Analyze and optimize any Instagram account with precision.</p>
+            
+            <div class="service-card">
+                <h3>🔍 Account Analyzer</h3>
+                <p>Scan any profile for hidden data, engagement patterns, and shadowban status.</p>
+                <div class="tooltip">What does this show?
+                    <span class="tooltiptext">Checks for deleted posts, ghost followers, and engagement drops.</span>
+                </div>
+                <button class="btn" onclick="runTool('instagram', 'analyzer')">Scan Account</button>
+            </div>
+            
+            <div class="service-card">
+                <h3>👁️ Private Viewer</h3>
+                <p>View private account content without following.</p>
+                <div class="tooltip">How does this work?
+                    <span class="tooltiptext">Uses cached data from Instagram's CDN to bypass privacy settings.</span>
+                </div>
+                <button class="btn" onclick="runTool('instagram', 'private')">Begin Scan</button>
+            </div>
+            
+            <div class="service-card">
+                <h3>📈 Engagement Booster</h3>
+                <p>Increase your post visibility with AI-powered engagement.</p>
+                <div class="tooltip">Is this safe?
+                    <span class="tooltiptext">Uses real user behavior patterns to avoid detection.</span>
+                </div>
+                <button class="btn" onclick="runTool('instagram', 'engagement')">Optimize Now</button>
+            </div>
+        </div>
+        
+        <div id="terminal" class="terminal">
+            > [SYSTEM] Ready. Select a tool to begin.<br>
+            > [STATUS] API Connection: Secure<br>
+        </div>
+        
+        <div id="loading" class="loading-bar hidden"></div>
+        <div id="progress-text" class="progress-text hidden"></div>
+        
+        <div id="captcha-modal" class="hidden">
+            <div class="captcha-box">
+                <h3>🔒 Verify You're Human</h3>
+                <p>Complete this CAPTCHA to continue:</p>
+                <div class="captcha-text" id="captcha-text">A7B9C2</div>
+                <input type="text" class="captcha-input" id="captcha-input" placeholder="Enter CAPTCHA">
+                <button class="btn" onclick="verifyCaptcha()">Submit</button>
+            </div>
+        </div>
+        
+        <div id="success-modal" class="hidden">
+            <div style="background: #1a1a1a; border: 1px solid #4CAF50; padding: 20px; border-radius: 5px; text-align: center;">
+                <h3>✅ Scan Complete!</h3>
+                <p id="success-message"></p>
+                <div style="margin: 20px 0;">
+                    <div style="background: #222; height: 20px; border-radius: 10px; overflow: hidden;">
+                        <div id="success-bar" style="background: #4CAF50; height: 100%; width: 0%; transition: width 2s;"></div>
+                    </div>
+                    <p id="success-percent">0%</p>
+                </div>
+                <button class="btn" onclick="closeSuccessModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Session timer countdown
+        let minutes = 5;
+        let seconds = 0;
+        const timerElement = document.getElementById('session-timer');
+        
+        const timer = setInterval(() => {
+            if (seconds === 0) {
+                if (minutes === 0) {
+                    clearInterval(timer);
+                    timerElement.innerHTML = "EXPIRED";
+                    timerElement.style.color = "#f44336";
+                    return;
+                }
+                minutes--;
+                seconds = 59;
+            } else {
+                seconds--;
+            }
+            timerElement.innerHTML = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+        }, 1000);
+        
+        function selectPlatform(platform) {
+            document.querySelectorAll('.platform-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            addTerminalLog(`[SYSTEM] Loading ${platform.toUpperCase()} module...`);
+            addTerminalLog(`[INFO] Last scan: ${Math.floor(Math.random() * 60)} minutes ago`);
+        }
+        
+        function runTool(platform, tool) {
+            document.getElementById('terminal').innerHTML = '';
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('loading').style.width = '0%';
+            document.getElementById('progress-text').classList.remove('hidden');
+            document.getElementById('progress-text').innerHTML = 'Initializing...';
+            
+            // Fake loading sequence
+            setTimeout(() => { 
+                document.getElementById('loading').style.width = '20%';
+                document.getElementById('progress-text').innerHTML = 'Connecting to API...';
+                addTerminalLog(`[${platform.toUpperCase()}] Establishing secure connection...`);
+            }, 800);
+            
+            setTimeout(() => { 
+                document.getElementById('loading').style.width = '45%';
+                document.getElementById('progress-text').innerHTML = 'Bypassing security...';
+                addTerminalLog(`[SECURITY] Spoofing device signature...`);
+            }, 1800);
+            
+            setTimeout(() => { 
+                document.getElementById('loading').style.width = '70%';
+                document.getElementById('progress-text').innerHTML = 'Scanning target...';
+                addTerminalLog(`[SCAN] Analyzing account structure...`);
+                
+                // Show CAPTCHA at 70%
+                setTimeout(() => {
+                    document.getElementById('loading').style.width = '100%';
+                    document.getElementById('progress-text').innerHTML = 'Verification required';
+                    showCaptcha();
+                }, 1200);
+            }, 3000);
+        }
+        
+        function showCaptcha() {
+            // Generate random CAPTCHA
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let captcha = '';
+            for (let i = 0; i < 6; i++) {
+                captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('captcha-text').textContent = captcha;
+            document.getElementById('captcha-modal').classList.remove('hidden');
+        }
+        
+        function verifyCaptcha() {
+            const input = document.getElementById('captcha-input').value;
+            const captcha = document.getElementById('captcha-text').textContent;
+            
+            if (input === captcha) {
+                document.getElementById('captcha-modal').classList.add('hidden');
+                addTerminalLog(`[VERIFICATION] CAPTCHA passed. Continuing scan...`);
+                showSuccess();
+            } else {
+                addTerminalLog(`[ERROR] Invalid CAPTCHA. Try again.`);
+                document.getElementById('captcha-input').value = '';
+                document.getElementById('captcha-input').placeholder = 'Wrong! Try again';
+            }
+        }
+        
+        function showSuccess() {
+            const tools = {
+                'analyzer': 'Account analysis complete. Found 127 hidden details.',
+                'private': 'Private content accessed successfully. Downloading data...',
+                'engagement': 'Engagement optimized. Projected +87% visibility.'
+            };
+            
+            document.getElementById('success-message').textContent = tools[event.target.parentElement.parentElement.id];
+            document.getElementById('success-modal').classList.remove('hidden');
+            
+            // Animate progress bar
+            let percent = 0;
+            const interval = setInterval(() => {
+                percent += 1;
+                document.getElementById('success-bar').style.width = `${percent}%`;
+                document.getElementById('success-percent').textContent = `${percent}%`;
+                
+                if (percent >= 100) {
+                    clearInterval(interval);
+                    addTerminalLog(`[SUCCESS] Process completed successfully!`);
+                }
+            }, 30);
+        }
+        
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.add('hidden');
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('progress-text').classList.add('hidden');
+        }
+        
+        function addTerminalLog(message) {
+            const terminal = document.getElementById('terminal');
+            terminal.innerHTML += `> ${message}<br>`;
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+    </script>
+</body>
+</html>

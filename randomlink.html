@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Random Link Button</title>
+<style>
+  body {
+    margin: 0;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  #randomBtn {
+    background-color: red;
+    border: none;
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    cursor: pointer;
+    outline: none;
+  }
+  #randomBtn:hover {
+    filter: brightness(120%);
+  }
+</style>
+</head>
+<body>
+  <button id="randomBtn" aria-label="Random Link Button"></button>
+
+  <script>
+    const links = [
+      // Your 25 sites (using main URLs)
+      "https://9gag.com",
+      "https://www.geoguessr.com",
+      "https://myretrotvs.com",
+      "https://archive.org/web/",
+      "https://freerice.com",
+      "https://zoomquilt.org",
+      "https://listverse.com",
+      "https://www.nytimes.com/games/wordle/index.html",
+      "https://sleepcalculator.com",
+      "https://www.whatshouldireadnext.com",
+      "https://www.merriam-webster.com/word-of-the-day",
+      "https://rainymood.com",
+      "https://postsecret.com",
+      "https://www.wikihow.com",
+      "https://www.autodraw.com",
+      "https://retroflix.org",
+      "https://themusicmap.com",
+      "https://1001albums.com",
+      "https://haveibeenpwned.com",
+      "https://littlerbooks.com",
+      "https://talksmi.com",
+      "https://typelit.io",
+      "https://colormagic.io",
+      "https://adsoftheworld.com",
+      "https://howdeepisit.com",
+
+      // 100+ additional random/fun websites
+      "https://pointerpointer.com",
+      "https://www.essaytyper.com",
+      "https://www.howmanypeopleareinspacerightnow.com",
+      "https://www.fallingfalling.com",
+      "https://corndog.io",
+      "https://www.sanger.dk",
+      "https://www.zoomquilt.org",
+      "https://randomcolour.com",
+      "https://www.bouncingdvdlogo.com",
+      "https://theuselessweb.com",
+      "https://www.omfgdogs.com",
+      "https://www.longdogechallenge.com",
+      "https://www.koalastothemax.com",
+      "https://hackertyper.net",
+      "https://cat-bounce.com",
+      "https://www.pointerpointer.com",
+      "https://www.everydayim.com",
+      "https://heeeeeeeey.com",
+      "https://chillestmonkey.com",
+      "https://www.corgiorgy.com",
+      "https://www.staggeringbeauty.com",
+      "https://www.hackertyper.net",
+      "https://www.birdorm.com",
+      "https://www.sanger.dk",
+      "https://www.cameragoogle.com",
+      "https://nooooooooooooooo.com",
+      "https://www.partridgegetslucky.com",
+      "https://cat-bounce.com",
+      "https://www.electricboogiewoogie.com",
+      "https://tencents.info",
+      "https://tinychat.com",
+      "https://www.lingscars.com",
+      "https://www.patience-is-a-virtue.org",
+      "https://www.donothingfor2minutes.com",
+      "https://www.zoomquilt.org",
+      "https://thatsthefinger.com",
+      "https://chihuahuaspin.com",
+      "https://www.deadface.co.uk",
+      "https://randomstreetview.com",
+      "https://pointerpointer.com",
+      "https://www.bouncyballs.org",
+      "https://www.sanger.dk",
+      "https://www.sleepyti.me",
+      "https://theuselessweb.site",
+      "https://www.mrtzcmp3.com",
+      "https://yellowsbest.com",
+      "https://www.partridgegetslucky.com",
+      "https://www.corgiorgy.com",
+      "https://www.sanger.dk",
+      "https://isitalwaysfriday.com",
+      "https://eelslap.com",
+      "https://www.ismycomputeron.com",
+      "https://www.pleaselike.com",
+      "https://www.zoomquilt.org",
+      "https://www.donothingfor2minutes.com",
+      "https://www.hackertyper.net",
+      "https://www.cornify.com",
+      "https://www.everydayim.com",
+      "https://nooooooooooooooo.com",
+      "https://cat-bounce.com",
+      "https://pointerpointer.com",
+      "https://www.bouncingdvdlogo.com",
+      "https://www.partridgegetslucky.com",
+      "https://www.omfgdogs.com",
+      "https://theuselessweb.com",
+      "https://www.fallingfalling.com",
+      "https://corndog.io",
+      "https://www.zoomquilt.org",
+      "https://randomcolour.com",
+      "https://www.birdorm.com",
+      "https://hackertyper.net",
+      "https://www.cameragoogle.com",
+      "https://thatsthefinger.com",
+      "https://chihuahuaspin.com",
+      "https://www.deadface.co.uk",
+      "https://randomstreetview.com",
+      "https://www.bouncyballs.org",
+      "https://www.sleepyti.me",
+      "https://isitalwaysfriday.com",
+      "https://eelslap.com",
+      "https://www.ismycomputeron.com",
+      "https://www.pleaselike.com",
+      "https://www.cornify.com",
+      "https://www.everydayim.com",
+      "https://nooooooooooooooo.com",
+      "https://cat-bounce.com",
+      "https://pointerpointer.com",
+      "https://www.bouncingdvdlogo.com",
+      "https://www.partridgegetslucky.com",
+      "https://www.omfgdogs.com",
+      "https://theuselessweb.com"
+      // Add more URLs here if you want!
+    ];
+
+    const btn = document.getElementById('randomBtn');
+    btn.addEventListener('click', () => {
+      const randomIndex = Math.floor(Math.random() * links.length);
+      window.location.href = links[randomIndex];
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Link Chart</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Arial', sans-serif;
+            color: white;
+        }
+        
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        
+        #link-chart {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            cursor: default;
+        }
+        
+        .node {
+            position: absolute;
+            width: 120px;
+            height: 60px;
+            background: rgba(40, 40, 40, 0.8);
+            border: 2px solid #4fc3f7;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(79, 195, 247, 0.5);
+            transition: all 0.3s ease;
+            cursor: move;
+            user-select: none;
+            text-align: center;
+            padding: 5px;
+            word-break: break-word;
+        }
+        
+        .node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(79, 195, 247, 0.8);
+        }
+        
+        .node.selected {
+            border-color: #ff4081;
+            box-shadow: 0 0 20px rgba(255, 64, 129, 0.8);
+        }
+        
+        .connection {
+            position: absolute;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        #controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            background: rgba(30, 30, 30, 0.7);
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        button {
+            background: linear-gradient(45deg, #4fc3f7, #2196f3);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button.delete {
+            background: linear-gradient(45deg, #ff4081, #f50057);
+        }
+        
+        #node-text {
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: none;
+            outline: none;
+            width: 200px;
+        }
+        
+        .context-menu {
+            position: absolute;
+            background: rgba(40, 40, 40, 0.9);
+            border: 1px solid #4fc3f7;
+            border-radius: 5px;
+            padding: 5px 0;
+            box-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .context-menu-item {
+            padding: 8px 15px;
+            cursor: pointer;
+            color: white;
+        }
+        
+        .context-menu-item:hover {
+            background: rgba(79, 195, 247, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div id="link-chart"></div>
+    
+    <div id="controls">
+        <input type="text" id="node-text" placeholder="Node content">
+        <button id="add-node">Add Node</button>
+        <button id="connect-nodes">Connect Selected</button>
+        <button id="delete-selected" class="delete">Delete Selected</button>
+    </div>
+    
+    <div class="context-menu" id="context-menu">
+        <div class="context-menu-item" id="connect-from-here">Connect from here</div>
+        <div class="context-menu-item" id="delete-node">Delete node</div>
+    </div>
+    
+    <script>
+        // Animated background
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const stars = [];
+        const starCount = 200;
+        
+        for (let i = 0; i < starCount; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.5,
+                vx: Math.floor(Math.random() * 50) - 25,
+                vy: Math.floor(Math.random() * 50) - 25
+            });
+        }
+        
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'white';
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                star.x += star.vx / 100;
+                star.y += star.vy / 100;
+                
+                if (star.x < 0 || star.x > canvas.width) star.vx = -star.vx;
+                if (star.y < 0 || star.y > canvas.height) star.vy = -star.vy;
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+        
+        // Link chart functionality
+        const linkChart = document.getElementById('link-chart');
+        let nodes = [];
+        let connections = [];
+        let selectedNodes = [];
+        let connectingMode = false;
+        let startNode = null;
+        
+        // Add node button
+        document.getElementById('add-node').addEventListener('click', () => {
+            const text = document.getElementById('node-text').value.trim();
+            if (text) {
+                addNode(text);
+                document.getElementById('node-text').value = '';
+            }
+        });
+        
+        // Connect nodes button
+        document.getElementById('connect-nodes').addEventListener('click', () => {
+            if (selectedNodes.length === 2) {
+                createConnection(selectedNodes[0], selectedNodes[1]);
+                clearSelection();
+            }
+        });
+        
+        // Delete selected button
+        document.getElementById('delete-selected').addEventListener('click', () => {
+            selectedNodes.forEach(node => {
+                deleteNode(node);
+            });
+            clearSelection();
+        });
+        
+        // Context menu items
+        document.getElementById('connect-from-here').addEventListener('click', () => {
+            if (startNode) {
+                createConnection(startNode, contextMenuNode);
+            }
+            hideContextMenu();
+        });
+        
+        document.getElementById('delete-node').addEventListener('click', () => {
+            deleteNode(contextMenuNode);
+            hideContextMenu();
+        });
+        
+        // Create a new node
+        function addNode(text, x = Math.random() * window.innerWidth * 0.7 + 100, y = Math.random() * window.innerHeight * 0.7 + 100) {
+            const node = document.createElement('div');
+            node.className = 'node';
+            node.textContent = text;
+            node.style.left = `${x}px`;
+            node.style.top = `${y}px`;
+            
+            node.dataset.id = Date.now().toString();
+            
+            // Node events
+            node.addEventListener('mousedown', startDrag);
+            node.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleSelectNode(node);
+            });
+            
+            node.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                showContextMenu(e, node);
+            });
+            
+            linkChart.appendChild(node);
+            nodes.push(node);
+            return node;
+        }
+        
+        // Create connection between nodes
+        function createConnection(node1, node2) {
+            if (node1 === node2) return;
+            
+            // Check if connection already exists
+            const existingConnection = connections.find(conn => 
+                (conn.from === node1 && conn.to === node2) || 
+                (conn.from === node2 && conn.to === node1)
+            );
+            
+            if (existingConnection) return;
+            
+            const line = document.createElement('div');
+            line.className = 'connection';
+            
+            linkChart.appendChild(line);
+            
+            const connection = {
+                from: node1,
+                to: node2,
+                element: line
+            };
+            
+            connections.push(connection);
+            updateConnection(connection);
+        }
+        
+        // Update connection position
+        function updateConnection(connection) {
+            const fromRect = connection.from.getBoundingClientRect();
+            const toRect = connection.to.getBoundingClientRect();
+            
+            const fromX = fromRect.left + fromRect.width / 2;
+            const fromY = fromRect.top + fromRect.height / 2;
+            const toX = toRect.left + toRect.width / 2;
+            const toY = toRect.top + toRect.height / 2;
+            
+            const length = Math.sqrt(Math.pow(toX - fromX, 2) + Math.pow(toY - fromY, 2));
+            const angle = Math.atan2(toY - fromY, toX - fromX);
+            
+            connection.element.style.width = `${length}px`;
+            connection.element.style.height = '2px';
+            connection.element.style.left = `${fromX}px`;
+            connection.element.style.top = `${fromY}px`;
+            connection.element.style.transformOrigin = '0 0';
+            connection.element.style.transform = `rotate(${angle}rad)`;
+            connection.element.style.background = `linear-gradient(to right, 
+                rgba(79, 195, 247, 0.7), 
+                rgba(156, 39, 176, 0.7))`;
+        }
+        
+        // Delete node and its connections
+        function deleteNode(node) {
+            // Remove all connections involving this node
+            connections = connections.filter(conn => {
+                if (conn.from === node || conn.to === node) {
+                    conn.element.remove();
+                    return false;
+                }
+                return true;
+            });
+            
+            // Remove node
+            node.remove();
+            nodes = nodes.filter(n => n !== node);
+            selectedNodes = selectedNodes.filter(n => n !== node);
+        }
+        
+        // Node selection
+        function toggleSelectNode(node) {
+            if (connectingMode) {
+                if (startNode) {
+                    createConnection(startNode, node);
+                    startNode = null;
+                    connectingMode = false;
+                }
+                return;
+            }
+            
+            const index = selectedNodes.indexOf(node);
+            if (index === -1) {
+                if (selectedNodes.length < 2) {
+                    node.classList.add('selected');
+                    selectedNodes.push(node);
+                }
+            } else {
+                node.classList.remove('selected');
+                selectedNodes.splice(index, 1);
+            }
+        }
+        
+        function clearSelection() {
+            selectedNodes.forEach(node => {
+                node.classList.remove('selected');
+            });
+            selectedNodes = [];
+        }
+        
+        // Drag functionality
+        function startDrag(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (e.button !== 0) return; // Only left mouse button
+            
+            const node = e.target;
+            const startX = e.clientX;
+            const startY = e.clientY;
+            const startLeft = parseInt(node.style.left);
+            const startTop = parseInt(node.style.top);
+            
+            function moveHandler(e) {
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                
+                node.style.left = `${startLeft + dx}px`;
+                node.style.top = `${startTop + dy}px`;
+                
+                // Update all connections for this node
+                connections.forEach(conn => {
+                    if (conn.from === node || conn.to === node) {
+                        updateConnection(conn);
+                    }
+                });
+            }
+            
+            function upHandler() {
+                document.removeEventListener('mousemove', moveHandler);
+                document.removeEventListener('mouseup', upHandler);
+            }
+            
+            document.addEventListener('mousemove', moveHandler);
+            document.addEventListener('mouseup', upHandler);
+        }
+        
+        // Context menu
+        let contextMenuNode = null;
+        
+        function showContextMenu(e, node) {
+            contextMenuNode = node;
+            const menu = document.getElementById('context-menu');
+            menu.style.display = 'block';
+            menu.style.left = `${e.clientX}px`;
+            menu.style.top = `${e.clientY}px`;
+            
+            startNode = node;
+            connectingMode = true;
+        }
+        
+        function hideContextMenu() {
+            document.getElementById('context-menu').style.display = 'none';
+            connectingMode = false;
+            startNode = null;
+        }
+        
+        document.addEventListener('click', hideContextMenu);
+        document.addEventListener('contextmenu', (e) => {
+            if (e.target.className !== 'node') {
+                hideContextMenu();
+            }
+        });
+        
+        // Window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            connections.forEach(conn => {
+                updateConnection(conn);
+            });
+        });
+        
+        // Initialize with some sample nodes
+        window.addEventListener('load', () => {
+            const node1 = addNode('Main Concept', 300, 200);
+            const node2 = addNode('Related Idea 1', 150, 350);
+            const node3 = addNode('Related Idea 2', 450, 350);
+            const node4 = addNode('Sub-point', 100, 500);
+            
+            createConnection(node1, node2);
+            createConnection(node1, node3);
+            createConnection(node2, node4);
+        });
+    </script>
+</body>
+</html>
